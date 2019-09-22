@@ -39,11 +39,15 @@
 				font-size:16px;
 			}
 			
-			p.number-box {
+			div.number-box {
+				display:inline-block;
+				margin:0 10px 0 24px;
+			}
+			
+			div.number-box > p {
 				width:28px;
 				padding-top:3px;
 				padding-bottom:4px;
-				margin:0 10px 0 24px;
 				border-bottom:1px solid #111;
 				pointer-events:none;
 				cursor:pointer;
@@ -153,7 +157,8 @@
 			var ui = crel("div",{"class":"ui"});
 			var btn = crel("div",{"class":"button"});
 			
-			var numberbox = crel("p",{"class":"number-box"},"0");
+			var numberbox = crel("div",{"class":"number-box"});
+			crel(numberbox,crel("p",{},"0"));
 			
 			var expr = crel("input",{
 				class:"expr",
@@ -161,7 +166,9 @@
 			});			
 			expr.value = "!(n%4)";
 			var setbutton = crel("p",{"class":"set"},"set");
-						
+					
+			
+				
 			crel(ui,btn);
 			crel(ui,numberbox);
 			crel(ui,expr);
@@ -291,9 +298,7 @@
 			});
 			
 			btn.style.cursor = "pointer";
-			
-			var isTouch = false;
-			
+						
 			var target = {
 				click:false,
 				x:0,
@@ -310,7 +315,7 @@
 					
 					target.x = x;
 					target.y = y;
-					target.value = +numberbox.textContent;
+					target.value = +numberbox.children[0].textContent;
 					
 					target.click = true;
 				}					
@@ -321,7 +326,7 @@
 				var tmp = ((target.value-(y-target.y))*0.1)>>0;
 				if(tmp<0) tmp = 0;		
 				else if(tmp>=2) tmp = 2;					
-				numberbox.textContent = tmp;
+				numberbox.children[0].textContent = tmp;
 				
 			};	
 			
@@ -331,30 +336,25 @@
 			}
 			
 			if("ontouchstart" in document.documentElement) {
-				
-				isTouch = true;
-				
-				document.addEventListener("touchstart", function(e) {
-					//e.preventDefault();
-					
-					var touchObject = e.targetTouches[0];
-					
+										
+				numberbox.addEventListener("touchstart",function(e) {
+					e.preventDefault();
+					var touchObject = e.targetTouches[0];					
 					onMouseDown(touchObject.pageX,touchObject.pageY);	
-				}, {passive: false});
+				},{passive: false});
 				
-				document.addEventListener("touchmove",function(e) {
-					//e.preventDefault();
+				numberbox.addEventListener("touchmove",function(e) {
 					if(target.click) {
 						var touchObject = e.targetTouches[0];
 						onMouseMove(touchObject.pageX,touchObject.pageY);	
 					}
 				}, {passive: false});
 				
-				document.addEventListener("touchend",function(e) {
+				numberbox.addEventListener("touchend",function(e) {
 					if(target.click) onMouseUp();
 				}, {passive: false});
 				
-				document.addEventListener("touchcansel",function(e) {
+				numberbox.addEventListener("touchcansel",function(e) {
 					if(target.click) onMouseUp();
 				}, {passive: false});
 				
@@ -375,7 +375,7 @@
 			
 			setbutton.addEventListener("click",function(e) {
 				
-				set(+numberbox.textContent,expr.value);
+				set(+numberbox.children[0].textContent,expr.value);
 				
 			});
 					
